@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Card, Pagination, Alert } from 'react-bootstrap';
 import PostCard from '../components/PostCard';
 import LoadingSpinner from '../components/LoadingSpinner';
-import api from '../services/api';
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
@@ -24,18 +23,24 @@ const Home = () => {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const params = {
-        page: currentPage,
-        limit: 9,
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: '9',
         ...(searchTerm && { search: searchTerm }),
         ...(selectedCategory && { category: selectedCategory }),
         sort: sortBy
-      };
+      });
 
-      const response = await api.get('/api/posts', { params });
-      setPosts(response.data.posts);
-      setPagination(response.data.pagination);
-      setSidebar(response.data.sidebar);
+      const response = await fetch(`http://localhost:5000/api/posts?${params}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      setPosts(data.posts || []);
+      setPagination(data.pagination || {});
+      setSidebar(data.sidebar || { categories: [], popularTags: [] });
       setError('');
     } catch (error) {
       setError('Failed to fetch posts');
@@ -104,7 +109,7 @@ const Home = () => {
                   }}
                 >
                   <option value="">All Categories</option>
-                  {sidebar.categories.map(category => (
+                  {sidebar.categories && sidebar.categories.map(category => (
                     <option key={category} value={category}>{category}</option>
                   ))}
                 </Form.Select>
@@ -195,7 +200,7 @@ const Home = () => {
               </Card.Header>
               <Card.Body>
                 <div className="d-grid gap-2">
-                  {sidebar.categories.map(category => (
+                  {sidebar.categories && sidebar.categories.map(category => (
                     <button
                       key={category}
                       className={`btn btn-outline-primary btn-sm ${
@@ -214,7 +219,7 @@ const Home = () => {
             </Card>
 
             {/* Popular Tags Widget */}
-            {sidebar.popularTags.length > 0 && (
+            {sidebar.popularTags && sidebar.popularTags.length > 0 && (
               <Card className="sidebar-widget">
                 <Card.Header>
                   <h5 className="mb-0">Popular Tags</h5>

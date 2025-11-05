@@ -1,32 +1,66 @@
 import React from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 
 const Footer = () => {
   return (
-    <footer className="bg-dark text-light py-4 mt-5">
+    <footer className="footer no-print">
       <Container>
-        <Row>
-          <Col md={6}>
-            <h5>{process.env.REACT_APP_SITE_NAME || 'My Blog'}</h5>
-            <p className="text-muted">
-              Sharing thoughts, experiences, and insights.
+        <div className="footer-content">
+          <div className="footer-section">
+            <h5 className="font-heading">{process.env.REACT_APP_SITE_NAME || 'My Blog'}</h5>
+            <p>
+              Sharing thoughts, experiences, and insights about technology, 
+              programming, and life. Join me on this journey of continuous learning.
             </p>
-          </Col>
-          <Col md={6}>
-            <h6>Connect</h6>
-            <p className="text-muted">
-              Follow me on social media for updates.
+          </div>
+          
+          <div className="footer-section">
+            <h5 className="font-heading">Quick Links</h5>
+            <ul className="list-unstyled">
+              <li className="mb-2">
+                <a href="/" className="interactive">Home</a>
+              </li>
+              <li className="mb-2">
+                <a href="/about" className="interactive">About</a>
+              </li>
+              <li className="mb-2">
+                <a href="/contact" className="interactive">Contact</a>
+              </li>
+            </ul>
+          </div>
+          
+          <div className="footer-section">
+            <h5 className="font-heading">Categories</h5>
+            <ul className="list-unstyled">
+              <li className="mb-2">
+                <a href="#" className="interactive">Technology</a>
+              </li>
+              <li className="mb-2">
+                <a href="#" className="interactive">Programming</a>
+              </li>
+              <li className="mb-2">
+                <a href="#" className="interactive">Web Development</a>
+              </li>
+              <li className="mb-2">
+                <a href="#" className="interactive">Tutorials</a>
+              </li>
+            </ul>
+          </div>
+          
+          <div className="footer-section">
+            <h5 className="font-heading">About</h5>
+            <p>
+              A personal blog focused on sharing knowledge and experiences in 
+              technology, programming, and web development.
             </p>
-          </Col>
-        </Row>
-        <hr className="text-muted" />
-        <Row>
-          <Col className="text-center">
-            <p className="text-muted mb-0">
-              © {new Date().getFullYear()} {process.env.REACT_APP_SITE_NAME || 'My Blog'}. All rights reserved.
-            </p>
-          </Col>
-        </Row>
+          </div>
+        </div>
+        
+        <div className="footer-bottom">
+          <p className="mb-0">
+            © 2025 My Blog. All rights reserved. Ladeesha Karunasinghe
+          </p>
+        </div>
       </Container>
     </footer>
   );

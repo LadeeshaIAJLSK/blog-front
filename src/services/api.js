@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getSessionId } from '../utils/sessionId';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -17,6 +18,11 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Add session ID to all requests for better user identification
+    const sessionId = getSessionId();
+    config.headers['X-Session-ID'] = sessionId;
+    
     return config;
   },
   (error) => {

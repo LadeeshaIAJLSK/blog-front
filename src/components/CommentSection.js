@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Form, Button, Alert } from 'react-bootstrap';
+import CommentLikeButton from './CommentLikeButton';
 import api from '../services/api';
 import { formatDate } from '../utils/helpers';
 
@@ -11,8 +12,31 @@ const CommentSection = ({ postId, comments: initialComments }) => {
     email: ''
   });
   const [loading, setLoading] = useState(false);
+  const [loadingComments, setLoadingComments] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // Fetch comments when component mounts or postId changes
+  React.useEffect(() => {
+    if (postId) {
+      fetchComments();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [postId]);
+
+  const fetchComments = async () => {
+    setLoadingComments(true);
+    try {
+      const response = await api.get(`/api/posts/${postId}/comments`);
+      setComments(response.data.comments || []);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+      // If API call fails, use initial comments
+      setComments(initialComments || []);
+    } finally {
+      setLoadingComments(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,10 +45,13 @@ const CommentSection = ({ postId, comments: initialComments }) => {
     setSuccess('');
 
     try {
-      const response = await api.post(`/api/posts/${postId}/comments`, newComment);
-      setComments([...comments, response.data.comment]);
+      await api.post(`/api/posts/${postId}/comments`, newComment);
+      // Refresh comments after adding new comment
+      await fetchComments();
       setNewComment({ text: '', username: '', email: '' });
       setSuccess('Comment added successfully!');
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to add comment');
     } finally {
@@ -92,11 +119,17 @@ const CommentSection = ({ postId, comments: initialComments }) => {
       </Card>
       
       {/* Comments List */}
-      {comments.length === 0 ? (
+      {loadingComments ? (
+        <div className="text-center py-3">
+          <div className="spinner-border" role="status">
+            <span className="visually-hidden">Loading comments...</span>
+          </div>
+        </div>
+      ) : comments.length === 0 ? (
         <p className="text-muted">No comments yet. Be the first to comment!</p>
       ) : (
         comments.map((comment, index) => (
-          <Card key={index} className="mb-3">
+          <Card key={comment._id || index} className="mb-3">
             <Card.Body>
               <div className="d-flex justify-content-between align-items-start">
                 <div>
@@ -104,7 +137,18 @@ const CommentSection = ({ postId, comments: initialComments }) => {
                   <small className="text-muted">{formatDate(comment.createdAt)}</small>
                 </div>
               </div>
-              <p className="mt-2 mb-0">{comment.text}</p>
+              <p className="mt-2 mb-2">{comment.text}</p>
+              <div className="d-flex align-items-center justify-content-between">
+                <CommentLikeButton 
+                  commentId={comment._id}
+                  initialLikesCount={comment.likesCount || 0}
+                />
+                <small className="text-muted">
+                  {comment.replies && comment.replies.length > 0 && 
+                    `${comment.replies.length} ${comment.replies.length === 1 ? 'reply' : 'replies'}`
+                  }
+                </small>
+              </div>
             </Card.Body>
           </Card>
         ))

@@ -4,7 +4,9 @@ import { Container, Row, Col, Card, Badge, Alert, Button } from 'react-bootstrap
 import { useAuth } from '../contexts/AuthContext';
 import CommentSection from '../components/CommentSection';
 import LoadingSpinner from '../components/LoadingSpinner';
+import LikeButton from '../components/LikeButton';
 import { formatDate } from '../utils/helpers';
+import { getImageUrl, handleImageError } from '../utils/imageUtils';
 import api from '../services/api';
 
 const PostDetail = () => {
@@ -107,9 +109,20 @@ const PostDetail = () => {
             {post.featuredImage && (
               <div className="mb-4">
                 <img
-                  src={`${process.env.REACT_APP_API_URL}/${post.featuredImage}`}
+                  src={getImageUrl(post.featuredImage)}
                   alt={post.title}
                   className="featured-image"
+                  style={{ 
+                    width: '100%', 
+                    height: 'auto', 
+                    maxHeight: '400px', 
+                    objectFit: 'cover',
+                    borderRadius: '8px'
+                  }}
+                  onError={handleImageError}
+                  onLoad={() => {
+                    console.log('Featured image loaded successfully for post:', post.title);
+                  }}
                 />
               </div>
             )}
@@ -120,9 +133,33 @@ const PostDetail = () => {
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
 
+            {/* Post Actions */}
+            <div className="mt-4 pt-4 border-top">
+              <div className="d-flex align-items-center justify-content-between">
+                <LikeButton 
+                  postId={post._id} 
+                  initialLikesCount={post.likesCount || 0}
+                  size="md"
+                />
+                <div className="share-buttons">
+                  <Button
+                    variant="outline-primary"
+                    size="sm"
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                      alert('Link copied to clipboard!');
+                    }}
+                    className="me-2"
+                  >
+                    Share
+                  </Button>
+                </div>
+              </div>
+            </div>
+
             {/* Tags */}
             {post.tags && post.tags.length > 0 && (
-              <div className="mt-4 pt-4 border-top">
+              <div className="mt-3">
                 <h6>Tags:</h6>
                 {post.tags.map((tag, index) => (
                   <Badge key={index} bg="light" text="dark" className="me-2">
@@ -165,10 +202,11 @@ const PostDetail = () => {
                   <div key={relatedPost._id} className="mb-3 pb-3 border-bottom">
                     {relatedPost.featuredImage && (
                       <img
-                        src={`${process.env.REACT_APP_API_URL}/${relatedPost.featuredImage}`}
+                        src={getImageUrl(relatedPost.featuredImage)}
                         alt={relatedPost.title}
                         className="img-fluid rounded mb-2"
                         style={{ height: '80px', width: '100%', objectFit: 'cover' }}
+                        onError={handleImageError}
                       />
                     )}
                     <h6>

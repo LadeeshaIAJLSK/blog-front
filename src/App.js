@@ -51,6 +51,7 @@ function App() {
                   <Profile />
                 </ProtectedRoute>
               } />
+              
             </Routes>
           </main>
           <Footer />

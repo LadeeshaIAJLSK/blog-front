@@ -12,9 +12,9 @@ const CreatePost = () => {
     category: '',
     tags: '',
     metaDescription: '',
-    published: false
+    status: 'published'
   });
-  const [featuredImage, setFeaturedImage] = useState(null);
+  const [imageUrl, setImageUrl] = useState('');
   const [imagePreview, setImagePreview] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,16 +32,10 @@ const CreatePost = () => {
     });
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFeaturedImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleImageUrlChange = (e) => {
+    const url = e.target.value;
+    setImageUrl(url);
+    setImagePreview(url);
   };
 
   const handleSubmit = async (e) => {
@@ -49,22 +43,13 @@ const CreatePost = () => {
     setLoading(true);
     setError('');
 
-    const submitData = new FormData();
-    Object.keys(formData).forEach(key => {
-      submitData.append(key, formData[key]);
-    });
-    
-    if (featuredImage) {
-      submitData.append('featuredImage', featuredImage);
-    }
+    const submitData = {
+      ...formData,
+      featuredImage: imageUrl || null
+    };
 
     try {
-      const response = await api.post('/api/posts', submitData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
+      const response = await api.post('/api/admin/posts', submitData);
       navigate('/admin/dashboard');
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to create post');
@@ -285,34 +270,61 @@ const CreatePost = () => {
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                      <Form.Label>Featured Image</Form.Label>
+                      <Form.Label>Featured Image URL</Form.Label>
                       <Form.Control
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
+                        type="url"
+                        placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
+                        value={imageUrl}
+                        onChange={handleImageUrlChange}
                       />
+                      <Form.Text className="text-muted">
+                        Use any image URL from the web
+                      </Form.Text>
+
                       {imagePreview && (
-                        <div className="mt-2">
-                          <img
-                            src={imagePreview}
-                            alt="Preview"
-                            className="img-fluid rounded"
-                            style={{ maxHeight: '200px' }}
-                          />
+                        <div className="mt-3">
+                          <div className="border rounded p-2" style={{ backgroundColor: '#f8f9fa' }}>
+                            <small className="text-muted d-block mb-2">Preview:</small>
+                            <img
+                              src={imagePreview}
+                              alt="Preview"
+                              className="img-fluid rounded"
+                              style={{ maxHeight: '200px', maxWidth: '100%' }}
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextElementSibling.style.display = 'block';
+                              }}
+                            />
+                            <div 
+                              style={{ 
+                                display: 'none', 
+                                padding: '20px', 
+                                textAlign: 'center', 
+                                color: '#dc3545',
+                                backgroundColor: '#f8f9fa',
+                                border: '2px dashed #dc3545',
+                                borderRadius: '4px'
+                              }}
+                            >
+                              Failed to load image. Please check the URL.
+                            </div>
+                          </div>
                         </div>
                       )}
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                      <Form.Check
-                        type="checkbox"
-                        name="published"
-                        checked={formData.published}
+                      <Form.Label>Post Status</Form.Label>
+                      <Form.Select
+                        name="status"
+                        value={formData.status}
                         onChange={handleChange}
-                        label="Publish immediately"
-                      />
+                      >
+                        <option value="published">Published (visible to visitors)</option>
+                        <option value="draft">Draft (save for later)</option>
+                      </Form.Select>
                       <Form.Text className="text-muted">
-                        {formData.published ? 'Will be visible to visitors' : 'Save as draft'}
+                        {formData.status === 'published' ? 'Will be visible to visitors immediately' : 'Saved as draft for later editing'}
                       </Form.Text>
                     </Form.Group>
 
@@ -328,7 +340,7 @@ const CreatePost = () => {
                             Creating...
                           </>
                         ) : (
-                          formData.published ? 'Publish Post' : 'Save as Draft'
+                          formData.status === 'published' ? 'Publish Post' : 'Save as Draft'
                         )}
                       </Button>
                       

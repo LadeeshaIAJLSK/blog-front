@@ -14,7 +14,7 @@ const EditPost = () => {
     category: '',
     tags: '',
     metaDescription: '',
-    published: false
+    status: 'published'
   });
   const [featuredImage, setFeaturedImage] = useState(null);
   const [currentImage, setCurrentImage] = useState('');
@@ -34,7 +34,7 @@ const EditPost = () => {
 
   const fetchPost = async () => {
     try {
-      const response = await api.get(`/api/posts/${id}`);
+      const response = await api.get(`/api/admin/posts/${id}`);
       const post = response.data.post;
       
       setFormData({
@@ -44,7 +44,7 @@ const EditPost = () => {
         category: post.category,
         tags: post.tags.join(', '),
         metaDescription: post.metaDescription || '',
-        published: post.published
+        status: post.status || 'published'
       });
       
       if (post.featuredImage) {
@@ -93,7 +93,7 @@ const EditPost = () => {
     }
 
     try {
-      await api.put(`/api/posts/${id}`, submitData, {
+      await api.put(`/api/admin/posts/${id}`, submitData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -110,7 +110,7 @@ const EditPost = () => {
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
       try {
-        await api.delete(`/api/posts/${id}`);
+        await api.delete(`/api/admin/posts/${id}`);
         navigate('/admin/dashboard');
       } catch (error) {
         setError('Failed to delete post');
@@ -371,15 +371,17 @@ const EditPost = () => {
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                      <Form.Check
-                        type="checkbox"
-                        name="published"
-                        checked={formData.published}
+                      <Form.Label>Post Status</Form.Label>
+                      <Form.Select
+                        name="status"
+                        value={formData.status}
                         onChange={handleChange}
-                        label="Published"
-                      />
+                      >
+                        <option value="published">Published (visible to visitors)</option>
+                        <option value="draft">Draft (save for later)</option>
+                      </Form.Select>
                       <Form.Text className="text-muted">
-                        {formData.published ? 'Visible to visitors' : 'Saved as draft'}
+                        {formData.status === 'published' ? 'Visible to visitors' : 'Saved as draft'}
                       </Form.Text>
                     </Form.Group>
 
