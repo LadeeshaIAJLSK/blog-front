@@ -49,7 +49,7 @@ const CreatePost = () => {
     };
 
     try {
-      const response = await api.post('/api/admin/posts', submitData);
+      await api.post('/api/admin/posts', submitData);
       navigate('/admin/dashboard');
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to create post');

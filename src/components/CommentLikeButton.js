@@ -11,6 +11,7 @@ const CommentLikeButton = ({ commentId, initialLikesCount = 0, initialLiked = fa
 
   useEffect(() => {
     checkLikeStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentId]);
 
   const checkLikeStatus = async () => {

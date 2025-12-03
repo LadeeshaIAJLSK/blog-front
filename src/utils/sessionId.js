@@ -20,4 +20,5 @@ export const getSessionId = () => {
   return generateSessionId();
 };
 
-export default { getSessionId };
+const sessionIdExport = { getSessionId };
+export default sessionIdExport;

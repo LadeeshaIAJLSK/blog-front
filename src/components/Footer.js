@@ -21,10 +21,10 @@ const Footer = () => {
                 <a href="/" className="interactive">Home</a>
               </li>
               <li className="mb-2">
-                <a href="/about" className="interactive">About</a>
+                <button className="interactive btn btn-link p-0 text-start text-decoration-none">About</button>
               </li>
               <li className="mb-2">
-                <a href="/contact" className="interactive">Contact</a>
+                <button className="interactive btn btn-link p-0 text-start text-decoration-none">Contact</button>
               </li>
             </ul>
           </div>
@@ -33,16 +33,16 @@ const Footer = () => {
             <h5 className="font-heading">Categories</h5>
             <ul className="list-unstyled">
               <li className="mb-2">
-                <a href="#" className="interactive">Technology</a>
+                <button className="interactive btn btn-link p-0 text-start text-decoration-none">Technology</button>
               </li>
               <li className="mb-2">
-                <a href="#" className="interactive">Programming</a>
+                <button className="interactive btn btn-link p-0 text-start text-decoration-none">Programming</button>
               </li>
               <li className="mb-2">
-                <a href="#" className="interactive">Web Development</a>
+                <button className="interactive btn btn-link p-0 text-start text-decoration-none">Web Development</button>
               </li>
               <li className="mb-2">
-                <a href="#" className="interactive">Tutorials</a>
+                <button className="interactive btn btn-link p-0 text-start text-decoration-none">Tutorials</button>
               </li>
             </ul>
           </div>

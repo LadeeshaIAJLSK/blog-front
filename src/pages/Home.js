@@ -18,6 +18,7 @@ const Home = () => {
 
   useEffect(() => {
     fetchPosts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, selectedCategory, currentPage, sortBy]);
 
   const fetchPosts = async () => {
