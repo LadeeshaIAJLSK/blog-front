@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { getSessionId } from '../utils/sessionId';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+// Use relative API path on Netlify, localhost for development
+const API_URL = process.env.REACT_APP_API_URL || 
+  (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000');
 
 const api = axios.create({
   baseURL: API_URL,
